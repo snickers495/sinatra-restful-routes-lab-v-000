@@ -4,14 +4,13 @@ class ApplicationController < Sinatra::Base
     set :views, 'app/views'
   end
 
-  get '/recipes' do
-    @recipes = Recipe.all
+  get '/' do
     erb :index
   end
 
-  get '/recipes/:id' do
-    @recipe = Recipe.find_by_id(params[:id])
-    erb :show
+  get '/recipes' do
+    @recipes = Recipe.all
+    erb :recipes
   end
 
   get '/recipes/new' do
@@ -19,8 +18,14 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/recipes' do
-    @recipe = Recipe.create(:name => params[:name], :ingredients => params[:ingredients], :cook_time => params[:cook_time])
-    redirect to "/recipes/#{@recipe.id}"
+    @recipe = Recipe.new(name: params[:name], ingredients: params[:ingredients], cook_time: params[:cook_time])
+    @recipe.save
+    redirect "/recipes/#{@recipe.id}"
+  end
+
+  get '/recipes/:id' do
+    @recipe = Recipe.find_by_id(params[:id])
+    erb :show
   end
 
   get '/recipes/:id/edit' do
@@ -38,9 +43,8 @@ class ApplicationController < Sinatra::Base
   end
 
   delete '/recipes/:id/delete' do
-    @recipe = Recipe.find(params[:id])
+    @recipe = Recipe.find_by_id(params[:id])
     @recipe.delete
     redirect '/recipes'
   end
-
 end
